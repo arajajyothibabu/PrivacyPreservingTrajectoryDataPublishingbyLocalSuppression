@@ -5,6 +5,6 @@ package models;
  */
 public class QuasiDataModel {
 
-    //TODO: Yet to implement 
+    //TODO: Yet to implement
 
 }
