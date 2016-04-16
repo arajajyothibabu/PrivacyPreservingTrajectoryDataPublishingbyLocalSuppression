@@ -1,6 +1,8 @@
 package utils;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 /**
@@ -8,8 +10,8 @@ import java.util.ArrayList;
  */
 public class OracleDAO {
 
-    private DB db;
-    private Connection connection;
+    private static DB db;
+    private static Connection connection;
 
     public OracleDAO(DB db, Connection connection) {
         this.db = db;
@@ -19,6 +21,12 @@ public class OracleDAO {
     public OracleDAO() {
     }
 
-    public static String getDiagnosis()
+    public static String getDiagnosis(int id) throws Exception {
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM sensitivedata WHERE id = '" + id + "'");
+        if(resultSet.next()){
+
+        }
+    }
 
 }
