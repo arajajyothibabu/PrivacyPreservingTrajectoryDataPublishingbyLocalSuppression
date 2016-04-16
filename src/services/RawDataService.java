@@ -37,4 +37,9 @@ public class RawDataService {
         return isInserted;
     }
 
+    public boolean emptyRawData() throws Exception {
+        boolean isTruncated = dao.emptyRawData();
+        return isTruncated;
+    }
+
 }
