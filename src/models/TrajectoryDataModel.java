@@ -41,4 +41,21 @@ public class TrajectoryDataModel {
     public void setTime(String time) {
         this.time = time;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TrajectoryDataModel)) return false;
+
+        TrajectoryDataModel that = (TrajectoryDataModel) o;
+
+        return getTime().equals(that.getTime());
+
+    }
+
+    @Override
+    public int hashCode() {
+        return getTime().hashCode();
+    }
+
 }
