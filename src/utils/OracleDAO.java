@@ -9,9 +9,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.SortedSet;
-import java.util.StringJoiner;
-import java.util.TreeSet;
 
 /**
  * Created by Araja Jyothi Babu on 15-Apr-16.
@@ -51,7 +48,7 @@ public class OracleDAO {
 
     public static ArrayList<TrajectoryDataModel> getTrajectoryData(int id) throws Exception {
         Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery("SELECT * FROM trajectorydata WHERE id = '" + id + "'");
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM trajectorydata WHERE id = '" + id + "' ORDER BY time");
         ArrayList<TrajectoryDataModel> trajectoryDataModels = new ArrayList();
         while(resultSet.next()){
             trajectoryDataModels.add(Utils.makeTrajectoryDataModel(resultSet));

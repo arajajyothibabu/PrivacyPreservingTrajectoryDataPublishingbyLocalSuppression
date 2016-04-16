@@ -19,11 +19,11 @@ import java.util.TreeSet;
 public class TrajectoryDataAnonymizor {
 
     //TODO:
-    private int L;
-    private int K;
-    private int C;
-    private int _K;
-    private SensitiveDataModel S;
+    private int L;  //maximum length of the background knowledge.
+    private int K;  //anonymity threshold
+    private double C;  //confidence threshold
+    private int _K; //minimum support threshold
+    private SensitiveDataModel S;   //set of sensitive values of the sensitive attributes
 
     //TODO:QuasiDataService quasiDataService;
     RawDataService rawDataService;
