@@ -1,12 +1,17 @@
 package utils;
 
+import models.RawDataModel;
 import models.SensitiveDataModel;
 import models.TrajectoryDataModel;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.SortedSet;
+import java.util.StringJoiner;
+import java.util.TreeSet;
 
 /**
  * Created by Araja Jyothi Babu on 15-Apr-16.
@@ -44,6 +49,43 @@ public class OracleDAO {
         return trajectoryDataModels;
     }
 
-    
+    public static ArrayList<String> getAllDoublets() throws Exception {
+        ArrayList<String> uniqueDoublets = new ArrayList();
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT DISTINCT location, time FROM trajectorydata");
+        while(resultSet.next()){
+            uniqueDoublets.add(Utils.makeDoublet(resultSet));
+        }
+        return uniqueDoublets;
+    }
+
+    public static boolean insertRawData(RawDataModel rawDataModel) throws Exception{
+        PreparedStatement statement = connection.prepareStatement("INSERT INTO rawdatatable VALUES (?,?,?)");
+        statement.setInt(1, rawDataModel.getId());
+        statement.setString(2, rawDataModel.getPath());
+        statement.setString(3, rawDataModel.getDiagnosis());
+        boolean isInserted = statement.execute();
+        return isInserted;
+    }
+
+    public static ArrayList<RawDataModel> getRawData() throws Exception {
+        ArrayList<RawDataModel> rawDataModels = new ArrayList();
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM rawdatatable");
+        while(resultSet.next()){
+            rawDataModels.add(Utils.makeRawDataModel(resultSet));
+        }
+        return rawDataModels;
+    }
+
+    public static RawDataModel getRawData(int id) throws Exception {
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM rawdatatable");
+        RawDataModel rawData = new RawDataModel();
+        if(resultSet.next()){
+            rawData = Utils.makeRawDataModel(resultSet);
+        }
+        return rawData;
+    }
 
 }
