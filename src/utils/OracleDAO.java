@@ -1,5 +1,8 @@
 package utils;
 
+import models.SensitiveDataModel;
+import models.TrajectoryDataModel;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -21,12 +24,26 @@ public class OracleDAO {
     public OracleDAO() {
     }
 
-    public static String getDiagnosis(int id) throws Exception {
+    public static SensitiveDataModel getSensitiveData(int id) throws Exception {
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery("SELECT * FROM sensitivedata WHERE id = '" + id + "'");
+        SensitiveDataModel sensitiveData = new SensitiveDataModel(0, "Healthy"); //FIXME: handling not found in db
         if(resultSet.next()){
-
+            sensitiveData = Utils.makeSensitiveDataModel(resultSet);
         }
+        return sensitiveData;
     }
+
+    public static ArrayList<TrajectoryDataModel> getTrajectoryData(int id) throws Exception {
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM trajectorydata WHERE id = '" + id + "'");
+        ArrayList<TrajectoryDataModel> trajectoryDataModels = new ArrayList();
+        while(resultSet.next()){
+            trajectoryDataModels.add(Utils.makeTrajectoryDataModel(resultSet));
+        }
+        return trajectoryDataModels;
+    }
+
+    
 
 }
