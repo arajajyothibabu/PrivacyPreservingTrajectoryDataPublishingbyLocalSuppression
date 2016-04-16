@@ -14,7 +14,7 @@ public class Utils {
     //global functions for use all over project
 
     public static SensitiveDataModel makeSensitiveDataModel(ResultSet rs) throws Exception{
-        return new SensitiveDataModel(rs.getString(1));
+        return new SensitiveDataModel(rs.getInt(1), rs.getString(2));
     }
 
     public static TrajectoryDataModel makeTrajectoryDataModel(ResultSet rs) throws Exception {
@@ -27,6 +27,10 @@ public class Utils {
 
     public static String makeDoublet(TrajectoryDataModel trajectoryDataModel) throws Exception {
         return trajectoryDataModel.getLocation() + "" + trajectoryDataModel.getTime();
+    }
+
+    public static String makeDoublet(ResultSet rs) throws Exception {
+        return rs.getString(1) + rs.getString(2);
     }
 
     public static String makeSingleString(ArrayList<String> doublets) throws Exception {
