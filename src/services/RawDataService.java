@@ -11,12 +11,10 @@ import java.util.ArrayList;
  */
 public class RawDataService {
 
-    DB db;
     OracleDAO dao;
 
-    public RawDataService(DB db) throws Exception{
-        this.db = db;
-        this.dao = new OracleDAO(db);
+    public RawDataService(OracleDAO dao) {
+        this.dao = dao;
     }
 
     public ArrayList<RawDataModel> getRawData() throws Exception{
