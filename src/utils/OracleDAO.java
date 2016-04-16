@@ -21,9 +21,9 @@ public class OracleDAO {
     private static DB db;
     private static Connection connection;
 
-    public OracleDAO(DB db, Connection connection) {
+    public OracleDAO(DB db) throws Exception{
         this.db = db;
-        this.connection = connection;
+        this.connection = db.openConnection();
     }
 
     public OracleDAO() {
@@ -39,6 +39,16 @@ public class OracleDAO {
         return sensitiveData;
     }
 
+    public static ArrayList<SensitiveDataModel> getSensitiveData() throws Exception {
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM sensitivedata");
+        ArrayList<SensitiveDataModel> sensitiveDataModels = new ArrayList();
+        if(resultSet.next()){
+            sensitiveDataModels.add(Utils.makeSensitiveDataModel(resultSet));
+        }
+        return sensitiveDataModels;
+    }
+
     public static ArrayList<TrajectoryDataModel> getTrajectoryData(int id) throws Exception {
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery("SELECT * FROM trajectorydata WHERE id = '" + id + "'");
@@ -49,7 +59,7 @@ public class OracleDAO {
         return trajectoryDataModels;
     }
 
-    public static ArrayList<String> getAllDoublets() throws Exception {
+    public static ArrayList<String> getAllUniqueDoublets() throws Exception {
         ArrayList<String> uniqueDoublets = new ArrayList();
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery("SELECT DISTINCT location, time FROM trajectorydata");
@@ -68,10 +78,19 @@ public class OracleDAO {
         return isInserted;
     }
 
+    public static boolean insertRawData(ArrayList<RawDataModel> rawDataModels) throws Exception{
+        int insertedCount = 0;
+        for(RawDataModel rawDataModel : rawDataModels){
+            if(insertRawData(rawDataModel))
+                insertedCount++;
+        }
+        return insertedCount == rawDataModels.size();
+    }
+
     public static ArrayList<RawDataModel> getRawData() throws Exception {
         ArrayList<RawDataModel> rawDataModels = new ArrayList();
         Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery("SELECT * FROM rawdatatable");
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM rawdatatable ORDER BY id");
         while(resultSet.next()){
             rawDataModels.add(Utils.makeRawDataModel(resultSet));
         }
@@ -86,6 +105,12 @@ public class OracleDAO {
             rawData = Utils.makeRawDataModel(resultSet);
         }
         return rawData;
+    }
+
+    public static boolean emptyRawData() throws Exception {
+        Statement statement = connection.createStatement();
+        boolean isTruncated = statement.execute("TRUNCATE TABLE rawdatatable");
+        return isTruncated;
     }
 
 }
