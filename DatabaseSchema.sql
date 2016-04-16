@@ -2,19 +2,18 @@ CREATE TABLE rawdatatable (
   id NUMBER(10) NOT NULL PRIMARY KEY,
   path VARCHAR2(100),
   diagnosis VARCHAR2(30)
+  REFERENCES sensitivedata
 );
 
 CREATE TABLE trajectorydata (
   id NUMBER(10) NOT NULL,
   location VARCHAR2(10) NOT NULL,
   time VARCHAR2(10) NOT NULL
-  REFERENCES rawdatatable
 );
 
 CREATE TABLE sensitivedata (
   id NUMBER(10) NOT NULL PRIMARY KEY ,
   diagnosis VARCHAR2(30)
-  REFERENCES rawdatatable
 );
 
 INSERT INTO trajectorydata VALUES('1', 'a', '1');
