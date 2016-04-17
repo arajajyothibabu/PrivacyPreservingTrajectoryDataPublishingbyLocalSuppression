@@ -72,10 +72,21 @@ public class TrajectoryDataAnonymizor {
 
     //helper functions
 
-    private ArrayList<RawDataModel> T_q(String q){
+    private static boolean areSubsets(String path, String q) throws Exception {
+        ArrayList<String> masterDoublets = Utils.arrayToArrayList(path.split("-"));
+        ArrayList<String> childDoublets = Utils.arrayToArrayList(q.split("-"));
+        for(String doublet : childDoublets){
+            if(!masterDoublets.contains(doublet))
+                return false;
+        }
+        return true;
+    }
+
+    private ArrayList<RawDataModel> T_q(String q) throws Exception {
         ArrayList<RawDataModel> recordsWithSequence_q = new ArrayList();
         for(RawDataModel rawDataModel : rawData){
-            if(rawDataModel.getPath().contains(q))
+            if(areSubsets(rawDataModel.getPath(),q))
+            //if(rawDataModel.getPath().contains(q))
                 recordsWithSequence_q.add(rawDataModel);
         }
         return recordsWithSequence_q;
@@ -93,12 +104,20 @@ public class TrajectoryDataAnonymizor {
         return conf;
     }
 
-    private boolean confidenceForAll_s_In_S_to_C(ArrayList<String> S, ArrayList<RawDataModel> T_q){
+    private boolean confidenceForAll_s_In_S_to_C(ArrayList<RawDataModel> T_q){
         for(String s : S){
             if(confidence(s, T_q) > C)
                 return false;
         }
         return true;
+    }
+
+    private boolean existenceOf_s_In_S_For_Sequence(ArrayList<RawDataModel> T_q){
+        for(String s : S){
+            if(confidence(s, T_q) > 0)
+                return true;
+        }
+        return false;
     }
 
     private static boolean areEqualExceptLastOne(ArrayList<String> qx, ArrayList<String> qy){
@@ -155,24 +174,31 @@ public class TrajectoryDataAnonymizor {
         ArrayList<ArrayList<String>> V = new ArrayList();
         ArrayList<RawDataModel> current_T_q = new ArrayList();
         while(i <= L && c.get(i-1) != null && c.get(i-1).size() > 0){
+            Utils.printList(c.get(i-1));
             U.add(new ArrayList<String>());
             V.add(new ArrayList<String>());
             for(String q : c.get(i-1)){
                 current_T_q = T_q(q);
                 if(current_T_q.size() > 0){
-                    if(current_T_q.size() >= K && confidenceForAll_s_In_S_to_C(S, current_T_q)){
+                    if(current_T_q.size() >= K && confidenceForAll_s_In_S_to_C(current_T_q)){
                         U.get(i-1).add(q);
                     }else{
-                        V.get(i-1).add(q);
+                        //FIXME: not entering sequences without having sensitive data S
+                        if(existenceOf_s_In_S_For_Sequence(current_T_q))
+                            V.get(i-1).add(q);
                     }
                 }
             }
             i++;
             c.add(selfJoin(U.get(i-2)));
-            for(String q: c.get(i-1)){
-                for(String violatingSequence : V.get(i-2))
-                    if(q.contains(violatingSequence))
-                        c.get(i-1).remove(q);
+            Iterator<String> iter = c.get(i-1).iterator(); //to check ConcurrentModificationException
+            while (iter.hasNext()) {
+                String q = iter.next();
+                for(String violatingSequence : V.get(i-2)) {
+                    //if(q.contains(violatingSequence))
+                    if (areSubsets(q, violatingSequence))
+                        iter.remove();
+                }
             }
         }
         V_T = unionOfSequences(V);
@@ -182,6 +208,8 @@ public class TrajectoryDataAnonymizor {
     }
 
     public static boolean isLocalSuppressionValid(String p, String m)  throws Exception {
+        ArrayList<String> P = new ArrayList();
+        ArrayList<String> _V = new ArrayList();
         return true;
     }
 

@@ -73,4 +73,9 @@ public class Utils {
         return strings;
     }
 
+    public static void printList(ArrayList<String> list){
+        for(String s : list)
+            System.out.print(">> " + s);
+    }
+
 }

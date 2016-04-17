@@ -59,7 +59,7 @@ public class OracleDAO {
     public static ArrayList<String> getAllUniqueDoublets() throws Exception {
         ArrayList<String> uniqueDoublets = new ArrayList();
         Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery("SELECT DISTINCT location, time FROM trajectorydata");
+        ResultSet resultSet = statement.executeQuery("SELECT DISTINCT location, time FROM trajectorydata ORDER BY location");
         while(resultSet.next()){
             uniqueDoublets.add(Utils.makeDoublet(resultSet));
         }
