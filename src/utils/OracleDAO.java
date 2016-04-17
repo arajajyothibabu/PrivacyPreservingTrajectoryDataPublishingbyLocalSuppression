@@ -78,7 +78,6 @@ public class OracleDAO {
     public static boolean insertRawData(ArrayList<RawDataModel> rawDataModels) throws Exception{
         int insertedCount = 0;
         for(RawDataModel rawDataModel : rawDataModels){
-            System.out.println("dao" + rawDataModel.getPath());
             if(insertRawData(rawDataModel))
                 insertedCount++;
         }

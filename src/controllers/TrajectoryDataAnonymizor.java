@@ -61,7 +61,6 @@ public class TrajectoryDataAnonymizor {
         for(SensitiveDataModel sensitiveData : sensitiveDataModels){
             path = generatePath(trajectoryDataService.getTrajectoryData(sensitiveData.id));
             rawDataModels.add(new RawDataModel(sensitiveData.id, path, sensitiveData.diagnosis));
-            System.out.println(sensitiveData.diagnosis);
         }
         rawDataService.insertRawData(rawDataModels);
     }
@@ -90,7 +89,8 @@ public class TrajectoryDataAnonymizor {
             if(rawDataModel.getDiagnosis().equals(s))
                 T_q_U_s++; //counting frequency of both s and T_q
         }
-        return T_q_U_s / T_q_size; //confidence
+        conf = T_q_U_s / T_q_size; //confidence
+        return conf;
     }
 
     private boolean confidenceForAll_s_In_S_to_C(ArrayList<String> S, ArrayList<RawDataModel> T_q){
@@ -113,7 +113,7 @@ public class TrajectoryDataAnonymizor {
     }
 
     private static int timeFromDoublet(String doublet){
-        return Integer.parseInt(doublet.replaceAll("^[0-9]",""));
+        return Integer.parseInt(doublet.replaceAll("[\\D]",""));
     }
 
     private static ArrayList<String> selfJoin(ArrayList<String> U_i) throws Exception {
@@ -154,7 +154,7 @@ public class TrajectoryDataAnonymizor {
         ArrayList<ArrayList<String>> U = new ArrayList();
         ArrayList<ArrayList<String>> V = new ArrayList();
         ArrayList<RawDataModel> current_T_q = new ArrayList();
-        while(i <= L && c.get(i-1) != null){
+        while(i <= L && c.get(i-1) != null && c.get(i-1).size() > 0){
             U.add(new ArrayList<String>());
             V.add(new ArrayList<String>());
             for(String q : c.get(i-1)){
@@ -170,12 +170,14 @@ public class TrajectoryDataAnonymizor {
             i++;
             c.add(selfJoin(U.get(i-2)));
             for(String q: c.get(i-1)){
-                for(String violatingSequences : V.get(i-2))
-                    if(q.contains(violatingSequences))
+                for(String violatingSequence : V.get(i-2))
+                    if(q.contains(violatingSequence))
                         c.get(i-1).remove(q);
             }
         }
         V_T = unionOfSequences(V);
+        for(String s : V_T)
+            System.out.println(s);
         return V_T;
     }
 
