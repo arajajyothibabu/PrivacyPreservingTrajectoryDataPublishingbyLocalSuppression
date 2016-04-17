@@ -3,7 +3,7 @@ package models;
 /**
  * Created by Araja Jyothi Babu on 15-Apr-16.
  */
-public class TrajectoryDataModel {
+public class TrajectoryDataModel implements Comparable{
 
     int id;
     String location;
@@ -58,4 +58,9 @@ public class TrajectoryDataModel {
         return getTime().hashCode();
     }
 
+    @Override
+    public int compareTo(Object o) {
+        TrajectoryDataModel that = (TrajectoryDataModel)o;
+        return Integer.parseInt(this.time) - Integer.parseInt(that.getTime());
+    }
 }
