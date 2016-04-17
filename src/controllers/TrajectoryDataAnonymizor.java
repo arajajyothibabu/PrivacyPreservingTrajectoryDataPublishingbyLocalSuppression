@@ -1,15 +1,8 @@
 package controllers;
 
-import models.RawDataModel;
-import models.SensitiveDataModel;
-import models.TrajectoryDataModel;
-import services.QuasiDataService;
-import services.RawDataService;
-import services.SensitiveDataService;
-import services.TrajectoryDataService;
-import utils.DB;
-import utils.OracleDAO;
-import utils.Utils;
+import models.*;
+import services.*;
+import utils.*;
 
 import java.util.ArrayList;
 import java.util.SortedSet;
@@ -25,7 +18,7 @@ public class TrajectoryDataAnonymizor {
     private int K;  //anonymity threshold
     private double C;  //confidence threshold
     private int _K; //minimum support threshold
-    private SensitiveDataModel S;   //set of sensitive values of the sensitive attributes
+    private ArrayList<String> S;   //set of sensitive values of the sensitive attributes
 
     //TODO:QuasiDataService quasiDataService;
     RawDataService rawDataService;
@@ -35,11 +28,12 @@ public class TrajectoryDataAnonymizor {
     DB db;
     OracleDAO dao;
 
-    public TrajectoryDataAnonymizor(int l, int k, double c, int _K, DB db) throws Exception {
+    public TrajectoryDataAnonymizor(int l, int k, double c, int _K, ArrayList<String> s, DB db) throws Exception {
         L = l;
         K = k;
         C = c;
         this._K = _K;
+        S = s;
         this.db = db;
         dao = new OracleDAO(db);
         rawDataService = new RawDataService(dao);
