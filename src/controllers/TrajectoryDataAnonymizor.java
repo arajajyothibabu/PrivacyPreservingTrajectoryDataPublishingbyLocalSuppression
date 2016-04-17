@@ -181,4 +181,8 @@ public class TrajectoryDataAnonymizor {
         return V_T;
     }
 
+    public static boolean isLocalSuppressionValid(String p, String m)  throws Exception {
+        return true;
+    }
+
 }
