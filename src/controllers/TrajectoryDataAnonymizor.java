@@ -7,6 +7,8 @@ import services.QuasiDataService;
 import services.RawDataService;
 import services.SensitiveDataService;
 import services.TrajectoryDataService;
+import utils.DB;
+import utils.OracleDAO;
 import utils.Utils;
 
 import java.util.ArrayList;
@@ -29,6 +31,21 @@ public class TrajectoryDataAnonymizor {
     RawDataService rawDataService;
     SensitiveDataService sensitiveDataService;
     TrajectoryDataService trajectoryDataService;
+
+    DB db;
+    OracleDAO dao;
+
+    public TrajectoryDataAnonymizor(int l, int k, double c, int _K, DB db) throws Exception {
+        L = l;
+        K = k;
+        C = c;
+        this._K = _K;
+        this.db = db;
+        dao = new OracleDAO(db);
+        rawDataService = new RawDataService(dao);
+        sensitiveDataService = new SensitiveDataService(dao);
+        trajectoryDataService = new TrajectoryDataService(dao);
+    }
 
     public static String generatePath(ArrayList<TrajectoryDataModel> doubletsWithId) throws Exception {
         SortedSet<TrajectoryDataModel> sortedDoubletsWithId = new TreeSet<TrajectoryDataModel>(doubletsWithId);
