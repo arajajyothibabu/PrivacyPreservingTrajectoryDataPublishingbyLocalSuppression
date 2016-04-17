@@ -22,7 +22,6 @@ public class Main {
         S.add("Hepatitis");
 
         TrajectoryDataAnonymizor trajectoryDataAnonymizor = new TrajectoryDataAnonymizor(L, K, C, _K, S, db);
-        trajectoryDataAnonymizor.updateRawData();
     }
 
 }
