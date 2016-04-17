@@ -40,7 +40,7 @@ public class OracleDAO {
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery("SELECT * FROM sensitivedata");
         ArrayList<SensitiveDataModel> sensitiveDataModels = new ArrayList();
-        if(resultSet.next()){
+        while(resultSet.next()){
             sensitiveDataModels.add(Utils.makeSensitiveDataModel(resultSet));
         }
         return sensitiveDataModels;
@@ -78,6 +78,7 @@ public class OracleDAO {
     public static boolean insertRawData(ArrayList<RawDataModel> rawDataModels) throws Exception{
         int insertedCount = 0;
         for(RawDataModel rawDataModel : rawDataModels){
+            System.out.println("dao" + rawDataModel.getPath());
             if(insertRawData(rawDataModel))
                 insertedCount++;
         }

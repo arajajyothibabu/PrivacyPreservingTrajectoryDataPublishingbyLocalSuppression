@@ -58,6 +58,7 @@ public class TrajectoryDataAnonymizor {
         for(SensitiveDataModel sensitiveData : sensitiveDataModels){
             path = generatePath(trajectoryDataService.getTrajectoryData(sensitiveData.id));
             rawDataModels.add(new RawDataModel(sensitiveData.id, path, sensitiveData.diagnosis));
+            System.out.println(sensitiveData.diagnosis);
         }
         rawDataService.insertRawData(rawDataModels);
     }

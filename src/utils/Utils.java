@@ -35,8 +35,10 @@ public class Utils {
 
     public static String makeSingleString(ArrayList<String> doublets) throws Exception {
         StringBuilder path = new StringBuilder("");
+        int length = doublets.size();
         for(String doublet : doublets){
-            path.append(doublet);
+            path.append(doublet + (length != 1 ? "-" : ""));
+            length--;
         }
         return path.toString();
     }
