@@ -43,4 +43,19 @@ public class RawDataModel {
         this.diagnosis = diagnosis;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof RawDataModel)) return false;
+
+        RawDataModel that = (RawDataModel) o;
+
+        return getId() == that.getId();
+
+    }
+
+    @Override
+    public int hashCode() {
+        return getId();
+    }
 }

@@ -12,11 +12,11 @@ import java.util.*;
 public class TrajectoryDataAnonymizor {
 
     //TODO:
-    private int L;  //maximum length of the background knowledge.
-    private int K;  //anonymity threshold
-    private double C;  //confidence threshold
-    private int _K; //minimum support threshold
-    private ArrayList<String> S;   //set of sensitive values of the sensitive attributes
+    private static int L;  //maximum length of the background knowledge.
+    private static int K;  //anonymity threshold
+    private static double C;  //confidence threshold
+    private static int _K; //minimum support threshold
+    private static ArrayList<String> S;   //set of sensitive values of the sensitive attributes
 
     //TODO:QuasiDataService quasiDataService;
     static RawDataService rawDataService;
@@ -27,7 +27,7 @@ public class TrajectoryDataAnonymizor {
     OracleDAO dao;
 
     //RawTrajectory Database
-    ArrayList<RawDataModel> rawData;
+    static ArrayList<RawDataModel> T;
 
     public TrajectoryDataAnonymizor(int l, int k, double c, int _K, ArrayList<String> s, DB db) throws Exception {
         L = l;
@@ -40,8 +40,8 @@ public class TrajectoryDataAnonymizor {
         rawDataService = new RawDataService(dao);
         sensitiveDataService = new SensitiveDataService(dao);
         trajectoryDataService = new TrajectoryDataService(dao);
-        updateRawData();    //updating rawData Database
-        rawData = getRawData(); //getting rawData
+        updateRawData();    //updating T Database
+        T = getRawData(); //getting T
     }
 
     public static String generatePath(ArrayList<TrajectoryDataModel> doubletsWithId) throws Exception {
@@ -66,16 +66,28 @@ public class TrajectoryDataAnonymizor {
     }
 
     private static ArrayList<RawDataModel> getRawData() throws Exception {
-        ArrayList<RawDataModel> rawData = rawDataService.getRawData();
-        return rawData;
+        ArrayList<RawDataModel> T = rawDataService.getRawData();
+        return T;
     }
 
     private static ArrayList<RawDataModel> getRawData(ArrayList<String> S) throws Exception {
-        ArrayList<RawDataModel> rawData = rawDataService.getRawData();
-        return rawData;
+        ArrayList<RawDataModel> T = rawDataService.getRawData(S);
+        return T;
     }
 
     //helper functions
+
+    private static ArrayList<RawDataModel> T_withSequence(String m) throws Exception{
+        ArrayList<RawDataModel> T = getRawData();
+        Iterator<RawDataModel> iter = T.iterator();
+        RawDataModel tuple;
+        while(iter.hasNext()){
+            tuple = iter.next();
+            if(areSubsets(tuple.getPath(), m))
+                iter.remove();
+        }
+        return T;
+    }
 
     private static boolean areSubsets(String path, String q) throws Exception {
         ArrayList<String> masterDoublets = Utils.arrayToArrayList(path.split("-"));
@@ -87,17 +99,7 @@ public class TrajectoryDataAnonymizor {
         return true;
     }
 
-    private ArrayList<RawDataModel> T_q(String q) throws Exception {
-        ArrayList<RawDataModel> recordsWithSequence_q = new ArrayList();
-        for(RawDataModel rawDataModel : rawData){
-            if(areSubsets(rawDataModel.getPath(),q))
-            //if(rawDataModel.getPath().contains(q))
-                recordsWithSequence_q.add(rawDataModel);
-        }
-        return recordsWithSequence_q;
-    }
-
-    private double confidence(String s, ArrayList<RawDataModel> T_q){
+    private static double confidence(String s, ArrayList<RawDataModel> T_q){
         double conf = 0;
         double T_q_U_s = 0;
         double T_q_size = T_q.size();
@@ -109,7 +111,7 @@ public class TrajectoryDataAnonymizor {
         return conf;
     }
 
-    private boolean confidenceForAll_s_In_S_to_C(ArrayList<RawDataModel> T_q){
+    private static boolean confidenceForAll_s_In_S_to_C(ArrayList<RawDataModel> T_q, ArrayList<String> S){
         for(String s : S){
             if(confidence(s, T_q) > C)
                 return false;
@@ -117,12 +119,29 @@ public class TrajectoryDataAnonymizor {
         return true;
     }
 
-    private boolean existenceOf_s_In_S_For_Sequence(ArrayList<RawDataModel> T_q){
+    private static boolean existenceOf_s_In_S_For_Sequence(ArrayList<RawDataModel> T_q){
         for(String s : S){
             if(confidence(s, T_q) > 0)
                 return true;
         }
         return false;
+    }
+
+    private static boolean existenceOf_Sequence(String sequence, ArrayList<RawDataModel> T_q) throws Exception {
+        for(RawDataModel tuple : T_q){
+            if(areSubsets(tuple.getPath(), sequence))
+                return true;
+        }
+        return false;
+    }
+
+    private static int frequencyOf_Sequence(String sequence, ArrayList<RawDataModel> T_q) throws Exception {
+        int count = 0;
+        for(RawDataModel tuple : T_q){
+            if(areSubsets(tuple.getPath(), sequence))
+                count++;
+        }
+        return count;
     }
 
     private static boolean areEqualExceptLastOne(ArrayList<String> qx, ArrayList<String> qy){
@@ -170,7 +189,7 @@ public class TrajectoryDataAnonymizor {
     }
 
     //Minimal Violating Sequences (MVS)
-    public ArrayList<String> minimalViolatingSequences() throws Exception{
+    public static ArrayList<String> minimalViolatingSequences() throws Exception{
         ArrayList<String> V_T = new ArrayList();
         ArrayList<ArrayList<String>> c = new ArrayList();
         c.add(trajectoryDataService.getAllUniqueDoublets()); //loading all distinct doublets
@@ -183,9 +202,9 @@ public class TrajectoryDataAnonymizor {
             U.add(new ArrayList<String>());
             V.add(new ArrayList<String>());
             for(String q : c.get(i-1)){
-                current_T_q = T_q(q);
+                current_T_q = T_withSequence(q);
                 if(current_T_q.size() > 0){
-                    if(current_T_q.size() >= K && confidenceForAll_s_In_S_to_C(current_T_q)){
+                    if(current_T_q.size() >= K && confidenceForAll_s_In_S_to_C(current_T_q, S)){
                         U.get(i-1).add(q);
                     }else{
                         //FIXME: not entering sequences without having sensitive data S
@@ -211,11 +230,107 @@ public class TrajectoryDataAnonymizor {
         return V_T;
     }
 
-    public static boolean isLocalSuppressionValid(String p, String m)  throws Exception {
-        ArrayList<String> P = new ArrayList();
-        ArrayList<String> _V = new ArrayList();
+    private static ArrayList<RawDataModel> T_p_withOut_T_m(ArrayList<RawDataModel> T_p, ArrayList<RawDataModel> T_m) throws Exception {
+        ArrayList<RawDataModel> Tp_Tm = new ArrayList();
+        for(RawDataModel tuple : T_p){
+            if(!T_m.contains(tuple))
+                Tp_Tm.add(tuple);
+        }
+        return Tp_Tm;
+    }
 
-        return true;
+    private static ArrayList<String> generateP(ArrayList<RawDataModel> T_m, ArrayList<RawDataModel> Tp_Tm) throws Exception{
+        ArrayList<String> P = trajectoryDataService.getAllUniqueDoublets(); //initialize with all doublets
+        Iterator<String> iter = P.iterator();
+        String p;
+        while (iter.hasNext()){
+            p = iter.next();
+            if(!(existenceOf_Sequence(p, T_m) && existenceOf_Sequence(p, Tp_Tm)))
+                iter.remove();
+        }
+        return P;
+    }
+
+    private static ArrayList<String> generate_V(String p) throws Exception {
+        ArrayList<String> mVS = minimalViolatingSequences(); //getting MVS
+        ArrayList<String> _V = new ArrayList();
+        for(String sequence : mVS){
+            if(Utils.sizeOfSequence(sequence) == 1 || sequence.contains(p)){
+                _V.add(sequence);
+            }
+        }
+        return _V;
+    }
+
+    private static ArrayList<String> V_p(String p) throws Exception {
+        ArrayList<String> mVS = minimalViolatingSequences(); //getting MVS
+        ArrayList<String> Vp = new ArrayList();
+        for(String sequence : mVS){
+            if(sequence.contains(p)){
+                Vp.add(sequence);
+            }
+        }
+        return Vp;
+    }
+
+    private static ArrayList<String> Vt_Vp(String p) throws Exception {
+        ArrayList<String> Vt = minimalViolatingSequences(); //getting MVS
+        ArrayList<String> Vp = V_p(p);
+        for(String sequence : Vt){
+            if(Vp.contains(sequence)){
+                Vt.remove(sequence);
+            }
+        }
+        return Vt; //V(T) - V(p)
+    }
+
+    private static boolean isSuperSequenceForSequences(String child, ArrayList<String> list) throws Exception {
+        for(String sequence : list){
+            if(areSubsets(child, sequence))
+                return true;
+        }
+        return false;
+    }
+
+    private static ArrayList<String> subSetOfS(ArrayList<RawDataModel> Tp_Tm){
+        ArrayList<String> subSet = new ArrayList();
+        for(RawDataModel tuple : Tp_Tm){
+            if(S.contains(tuple.getDiagnosis()))
+                subSet.add(tuple.getDiagnosis());
+        }
+        return subSet;
+    }
+
+    public static boolean isLocalSuppressionValid(String p, String m)  throws Exception {
+        //1.
+        ArrayList<RawDataModel> T_m = T_withSequence(m);
+        ArrayList<RawDataModel> T_p = T_withSequence(p);
+        ArrayList<RawDataModel> Tp_Tm = T_p_withOut_T_m(T_m, T_p);
+        ArrayList<String> P = generateP(T_m, Tp_Tm);
+        //2.
+        ArrayList<String> _V = generate_V(p);
+        //3.
+        for(String doublet : P){
+            if(!doublet.equals(p) && !_V.contains(doublet)){
+                P.remove(doublet);
+            }
+        }
+        //4.
+        ArrayList<String> Q = selfJoin(P);
+        ArrayList<String> Vp = V_p(p);
+        for(String sequence : Q){
+            if(Utils.sizeOfSequence(sequence) > L || isSuperSequenceForSequences(sequence, Vp))
+                Q.remove(sequence);
+        }
+        //6.for each sequence q with |q| > 0 do
+        ArrayList<String> subSet_S = subSetOfS(Tp_Tm);
+        ArrayList<RawDataModel> Tq;
+        for(String q : Q){
+            Tq = T_withSequence(q);
+            if(Utils.sizeOfSequence(q) < K || !confidenceForAll_s_In_S_to_C(Tq, subSet_S))
+                return true;
+        }
+        return false;
     }
 
 }

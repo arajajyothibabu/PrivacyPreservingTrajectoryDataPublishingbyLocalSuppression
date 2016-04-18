@@ -78,4 +78,8 @@ public class Utils {
             System.out.print(">> " + s);
     }
 
+    public static int sizeOfSequence(String sequence){
+        return sequence.split("-").length;
+    }
+
 }
