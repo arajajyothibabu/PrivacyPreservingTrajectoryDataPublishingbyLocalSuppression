@@ -83,7 +83,7 @@ public class TrajectoryDataAnonymizor {
         RawDataModel tuple;
         while(iter.hasNext()){
             tuple = iter.next();
-            if(areSubsets(tuple.getPath(), m))
+            if(!areSubsets(tuple.getPath(), m))
                 iter.remove();
         }
         return T;
@@ -111,12 +111,20 @@ public class TrajectoryDataAnonymizor {
         return conf;
     }
 
-    private static boolean confidenceForAll_s_In_S_to_C(ArrayList<RawDataModel> T_q, ArrayList<String> S){
+    private static boolean confidenceForAll_s_In_S_to_C(ArrayList<RawDataModel> T_q){
         for(String s : S){
             if(confidence(s, T_q) > C)
                 return false;
         }
         return true;
+    }
+
+    private static boolean confidenceForAll_s_In_subSetOfS_to_C(ArrayList<RawDataModel> T_q, ArrayList<String> subSetOfS){
+        for(String s : subSetOfS){
+            if(confidence(s, T_q) > C)
+                return true;
+        }
+        return false;
     }
 
     private static boolean existenceOf_s_In_S_For_Sequence(ArrayList<RawDataModel> T_q){
@@ -204,7 +212,7 @@ public class TrajectoryDataAnonymizor {
             for(String q : c.get(i-1)){
                 current_T_q = T_withSequence(q);
                 if(current_T_q.size() > 0){
-                    if(current_T_q.size() >= K && confidenceForAll_s_In_S_to_C(current_T_q, S)){
+                    if(current_T_q.size() >= K && confidenceForAll_s_In_S_to_C(current_T_q)){
                         U.get(i-1).add(q);
                     }else{
                         //FIXME: not entering sequences without having sensitive data S
@@ -226,14 +234,15 @@ public class TrajectoryDataAnonymizor {
             }
         }
         V_T = unionOfSequences(V);
-        //Utils.printList(V_T);
+        /*System.out.println("Minimal Violating Sequences: ");
+        Utils.printList(V_T);*/
         return V_T;
     }
 
     private static ArrayList<RawDataModel> T_p_withOut_T_m(ArrayList<RawDataModel> T_p, ArrayList<RawDataModel> T_m) throws Exception {
         ArrayList<RawDataModel> Tp_Tm = new ArrayList();
-        for(RawDataModel tuple : T_p){
-            if(!T_m.contains(tuple))
+        for(RawDataModel tuple : T_m){
+            if(!T_p.contains(tuple))
                 Tp_Tm.add(tuple);
         }
         return Tp_Tm;
@@ -301,34 +310,54 @@ public class TrajectoryDataAnonymizor {
         return subSet;
     }
 
+    private static ArrayList<String> possibleSequencesFrom(ArrayList<String> doublets) throws Exception{
+        ArrayList<String> possibleSequences = new ArrayList();
+        for(String doublet : doublets){
+            possibleSequences.add(doublet);
+        }
+        ArrayList<String> selfJoinedSequences = selfJoin(doublets);
+        for(String sequence : selfJoinedSequences){
+            possibleSequences.add(sequence);
+        }
+        return possibleSequences;
+    }
+
     public static boolean isLocalSuppressionValid(String p, String m)  throws Exception {
         //1.
         ArrayList<RawDataModel> T_m = T_withSequence(m);
         ArrayList<RawDataModel> T_p = T_withSequence(p);
         ArrayList<RawDataModel> Tp_Tm = T_p_withOut_T_m(T_m, T_p);
         ArrayList<String> P = generateP(T_m, Tp_Tm);
-        //2.
+        //2. generating V'
         ArrayList<String> _V = generate_V(p);
-        //3.
-        for(String doublet : P){
-            if(!doublet.equals(p) && !_V.contains(doublet)){
-                P.remove(doublet);
+        //3. removing
+        Iterator<String> iter_P = P.iterator();
+        String pInP;
+        while(iter_P.hasNext()){
+            pInP = iter_P.next();
+            //FIXME: didn't understand clearly what is the condition here. temporary fix
+            if(!pInP.equals(p) && _V.contains(pInP)){
+                iter_P.remove();
             }
         }
         //4.
-        ArrayList<String> Q = selfJoin(P);
+        ArrayList<String> Q = possibleSequencesFrom(P);
         ArrayList<String> Vp = V_p(p);
-        for(String sequence : Q){
-            if(Utils.sizeOfSequence(sequence) > L || isSuperSequenceForSequences(sequence, Vp))
-                Q.remove(sequence);
+        Iterator<String> iter_Q = Q.iterator();
+        String qInQ;
+        while(iter_P.hasNext()){
+            qInQ = iter_Q.next();
+            if(Utils.sizeOfSequence(qInQ) > L || isSuperSequenceForSequences(qInQ, Vp))
+                Q.remove(qInQ);
         }
         //6.for each sequence q with |q| > 0 do
         ArrayList<String> subSet_S = subSetOfS(Tp_Tm);
         ArrayList<RawDataModel> Tq;
         for(String q : Q){
             Tq = T_withSequence(q);
-            if(Utils.sizeOfSequence(q) < K || !confidenceForAll_s_In_S_to_C(Tq, subSet_S))
+            if(Utils.sizeOfSequence(q) < K || confidenceForAll_s_In_subSetOfS_to_C(Tq, subSet_S)) {
                 return true;
+            }
         }
         return false;
     }

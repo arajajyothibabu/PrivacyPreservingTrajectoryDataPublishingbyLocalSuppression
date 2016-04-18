@@ -76,6 +76,13 @@ public class Utils {
     public static void printList(ArrayList<String> list){
         for(String s : list)
             System.out.print(">> " + s);
+        System.out.println("\n_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-");
+    }
+
+    public static void printPath(ArrayList<RawDataModel> list){
+        for(RawDataModel rdm : list)
+            System.out.print(">> " + rdm.getPath());
+        System.out.println("\n_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-");
     }
 
     public static int sizeOfSequence(String sequence){
