@@ -22,6 +22,11 @@ public class RawDataService {
         return rawDataModels;
     }
 
+    public ArrayList<RawDataModel> getRawData(ArrayList<String> S) throws Exception{
+        ArrayList<RawDataModel> rawDataModels = dao.getRawData(S);
+        return rawDataModels;
+    }
+
     public RawDataModel getRawData(int id) throws Exception{
         RawDataModel rawData = dao.getRawData(id);
         return rawData;

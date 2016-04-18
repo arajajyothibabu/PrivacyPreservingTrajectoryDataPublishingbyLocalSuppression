@@ -70,6 +70,11 @@ public class TrajectoryDataAnonymizor {
         return rawData;
     }
 
+    private static ArrayList<RawDataModel> getRawData(ArrayList<String> S) throws Exception {
+        ArrayList<RawDataModel> rawData = rawDataService.getRawData();
+        return rawData;
+    }
+
     //helper functions
 
     private static boolean areSubsets(String path, String q) throws Exception {
@@ -174,7 +179,7 @@ public class TrajectoryDataAnonymizor {
         ArrayList<ArrayList<String>> V = new ArrayList();
         ArrayList<RawDataModel> current_T_q = new ArrayList();
         while(i <= L && c.get(i-1) != null && c.get(i-1).size() > 0){
-            Utils.printList(c.get(i-1));
+            //Utils.printList(c.get(i-1));
             U.add(new ArrayList<String>());
             V.add(new ArrayList<String>());
             for(String q : c.get(i-1)){
@@ -202,14 +207,14 @@ public class TrajectoryDataAnonymizor {
             }
         }
         V_T = unionOfSequences(V);
-        for(String s : V_T)
-            System.out.println(s);
+        //Utils.printList(V_T);
         return V_T;
     }
 
     public static boolean isLocalSuppressionValid(String p, String m)  throws Exception {
         ArrayList<String> P = new ArrayList();
         ArrayList<String> _V = new ArrayList();
+
         return true;
     }
 

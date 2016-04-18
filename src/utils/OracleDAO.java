@@ -94,6 +94,34 @@ public class OracleDAO {
         return rawDataModels;
     }
 
+    private static String createQuery(String selectClause, int length) {
+        String query = selectClause + " IN (";
+        StringBuilder queryBuilder = new StringBuilder(query);
+        for( int i = 0; i< length; i++){
+            queryBuilder.append(" ?");
+            if(i != length -1) queryBuilder.append(",");
+        }
+        if(length == 0)
+            queryBuilder.append("0");
+        queryBuilder.append(")");
+        return queryBuilder.toString();
+    }
+
+    public static ArrayList<RawDataModel> getRawData(ArrayList<String> S) throws Exception {
+        ArrayList<RawDataModel> rawDataModels = new ArrayList();
+        String selectClause = "SELECT * FROM rawdatatable WHERE diagnosis";
+        int sizeOfS = S.size();
+        PreparedStatement statement = connection.prepareStatement(createQuery(selectClause, sizeOfS));
+        for(int i = 0; i < sizeOfS; i++){
+            statement.setString(i+1, S.get(i));
+        }
+        ResultSet resultSet = statement.executeQuery();
+        while(resultSet.next()){
+            rawDataModels.add(Utils.makeRawDataModel(resultSet));
+        }
+        return rawDataModels;
+    }
+
     public static RawDataModel getRawData(int id) throws Exception {
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery("SELECT * FROM rawdatatable");
