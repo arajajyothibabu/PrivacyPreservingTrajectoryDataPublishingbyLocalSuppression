@@ -362,4 +362,10 @@ public class TrajectoryDataAnonymizor {
         return false;
     }
 
+    public static ArrayList<RawDataModel> anonymizedData() throws Exception {
+        ArrayList<String> mVS = minimalViolatingSequences();
+        //TODO: MFS Tree construction
+        
+    }
+
 }
