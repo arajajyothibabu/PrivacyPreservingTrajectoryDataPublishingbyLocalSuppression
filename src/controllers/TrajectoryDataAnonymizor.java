@@ -215,8 +215,7 @@ public class TrajectoryDataAnonymizor {
                     if(current_T_q.size() >= K && confidenceForAll_s_In_S_to_C(current_T_q)){
                         U.get(i-1).add(q);
                     }else{
-                        //FIXME: not entering sequences without having sensitive data S
-                        if(existenceOf_s_In_S_For_Sequence(current_T_q))
+                        //if(existenceOf_s_In_S_For_Sequence(current_T_q))
                             V.get(i-1).add(q);
                     }
                 }
