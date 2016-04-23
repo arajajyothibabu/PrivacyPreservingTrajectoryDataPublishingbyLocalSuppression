@@ -22,8 +22,8 @@ public class Main {
         S.add("Hepatitis");
 
         TrajectoryDataAnonymizor trajectoryDataAnonymizor = new TrajectoryDataAnonymizor(L, K, C, _K, S, db);
-        //trajectoryDataAnonymizor.minimalViolatingSequences();
-        trajectoryDataAnonymizor.isLocalSuppressionValid("d2", "d2-e4");
+        trajectoryDataAnonymizor.minimalViolatingSequences();
+        //trajectoryDataAnonymizor.isLocalSuppressionValid("d2", "d2-e4");
     }
 
 }

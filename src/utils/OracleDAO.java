@@ -15,8 +15,8 @@ import java.util.ArrayList;
  */
 public class OracleDAO {
 
-    private static DB db;
-    private static Connection connection;
+    private DB db;
+    private Connection connection;
 
     public OracleDAO(DB db) throws Exception{
         this.db = db;
@@ -26,7 +26,7 @@ public class OracleDAO {
     public OracleDAO() {
     }
 
-    public static SensitiveDataModel getSensitiveData(int id) throws Exception {
+    public SensitiveDataModel getSensitiveData(int id) throws Exception {
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery("SELECT * FROM sensitivedata WHERE id = '" + id + "'");
         SensitiveDataModel sensitiveData = new SensitiveDataModel(0, "Healthy"); //FIXME: handling not found in db
@@ -36,7 +36,7 @@ public class OracleDAO {
         return sensitiveData;
     }
 
-    public static ArrayList<SensitiveDataModel> getSensitiveData() throws Exception {
+    public ArrayList<SensitiveDataModel> getSensitiveData() throws Exception {
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery("SELECT * FROM sensitivedata");
         ArrayList<SensitiveDataModel> sensitiveDataModels = new ArrayList();
@@ -46,7 +46,7 @@ public class OracleDAO {
         return sensitiveDataModels;
     }
 
-    public static ArrayList<TrajectoryDataModel> getTrajectoryData(int id) throws Exception {
+    public ArrayList<TrajectoryDataModel> getTrajectoryData(int id) throws Exception {
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery("SELECT * FROM trajectorydata WHERE id = '" + id + "' ORDER BY time");
         ArrayList<TrajectoryDataModel> trajectoryDataModels = new ArrayList();
@@ -56,7 +56,7 @@ public class OracleDAO {
         return trajectoryDataModels;
     }
 
-    public static ArrayList<String> getAllUniqueDoublets() throws Exception {
+    public ArrayList<String> getAllUniqueDoublets() throws Exception {
         ArrayList<String> uniqueDoublets = new ArrayList();
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery("SELECT DISTINCT location, time FROM trajectorydata ORDER BY location");
@@ -66,7 +66,7 @@ public class OracleDAO {
         return uniqueDoublets;
     }
 
-    public static boolean insertRawData(RawDataModel rawDataModel) throws Exception{
+    public boolean insertRawData(RawDataModel rawDataModel) throws Exception{
         PreparedStatement statement = connection.prepareStatement("INSERT INTO rawdatatable VALUES (?,?,?)");
         statement.setInt(1, rawDataModel.getId());
         statement.setString(2, rawDataModel.getPath());
@@ -75,7 +75,7 @@ public class OracleDAO {
         return isInserted;
     }
 
-    public static boolean insertRawData(ArrayList<RawDataModel> rawDataModels) throws Exception{
+    public boolean insertRawData(ArrayList<RawDataModel> rawDataModels) throws Exception{
         int insertedCount = 0;
         for(RawDataModel rawDataModel : rawDataModels){
             if(insertRawData(rawDataModel))
@@ -84,7 +84,7 @@ public class OracleDAO {
         return insertedCount == rawDataModels.size();
     }
 
-    public static ArrayList<RawDataModel> getRawData() throws Exception {
+    public ArrayList<RawDataModel> getRawData() throws Exception {
         ArrayList<RawDataModel> rawDataModels = new ArrayList();
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery("SELECT * FROM rawdatatable ORDER BY id");
@@ -94,7 +94,7 @@ public class OracleDAO {
         return rawDataModels;
     }
 
-    private static String createQuery(String selectClause, int length) {
+    private String createQuery(String selectClause, int length) {
         String query = selectClause + " IN (";
         StringBuilder queryBuilder = new StringBuilder(query);
         for( int i = 0; i< length; i++){
@@ -107,7 +107,7 @@ public class OracleDAO {
         return queryBuilder.toString();
     }
 
-    public static ArrayList<RawDataModel> getRawData(ArrayList<String> S) throws Exception {
+    public ArrayList<RawDataModel> getRawData(ArrayList<String> S) throws Exception {
         ArrayList<RawDataModel> rawDataModels = new ArrayList();
         String selectClause = "SELECT * FROM rawdatatable WHERE diagnosis";
         int sizeOfS = S.size();
@@ -122,7 +122,7 @@ public class OracleDAO {
         return rawDataModels;
     }
 
-    public static RawDataModel getRawData(int id) throws Exception {
+    public RawDataModel getRawData(int id) throws Exception {
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery("SELECT * FROM rawdatatable");
         RawDataModel rawData = new RawDataModel();
@@ -132,7 +132,7 @@ public class OracleDAO {
         return rawData;
     }
 
-    public static boolean emptyRawData() throws Exception {
+    public boolean emptyRawData() throws Exception {
         Statement statement = connection.createStatement();
         boolean isTruncated = statement.execute("TRUNCATE TABLE rawdatatable");
         return isTruncated;
