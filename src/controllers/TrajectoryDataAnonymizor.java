@@ -6,6 +6,9 @@ import utils.*;
 
 import java.util.*;
 
+import static utils.Utils.areSubsets;
+import static utils.Utils.printList;
+
 /**
  * Created by Araja Jyothi Babu on 15-Apr-16.
  */
@@ -89,16 +92,6 @@ public class TrajectoryDataAnonymizor {
         return T;
     }
 
-    private boolean areSubsets(String path, String q) throws Exception {
-        ArrayList<String> masterDoublets = Utils.arrayToArrayList(path.split("-"));
-        ArrayList<String> childDoublets = Utils.arrayToArrayList(q.split("-"));
-        for(String doublet : childDoublets){
-            if(!masterDoublets.contains(doublet))
-                return false;
-        }
-        return true;
-    }
-
     private double confidence(String s, ArrayList<RawDataModel> T_q){
         double conf = 0;
         double T_q_U_s = 0;
@@ -141,15 +134,6 @@ public class TrajectoryDataAnonymizor {
                 return true;
         }
         return false;
-    }
-
-    private int frequencyOf_Sequence(String sequence, ArrayList<RawDataModel> T_q) throws Exception {
-        int count = 0;
-        for(RawDataModel tuple : T_q){
-            if(areSubsets(tuple.getPath(), sequence))
-                count++;
-        }
-        return count;
     }
 
     private boolean areEqualExceptLastOne(ArrayList<String> qx, ArrayList<String> qy){
@@ -363,7 +347,9 @@ public class TrajectoryDataAnonymizor {
 
     public ArrayList<RawDataModel> anonymizedData() throws Exception {
         ArrayList<RawDataModel> _T = new ArrayList();
-        ArrayList<String> mVS = minimalViolatingSequences();
+        //ArrayList<String> mVS = minimalViolatingSequences();
+        printList(trajectoryDataService.getAllUniqueDoublets());
+        MFS mfs = new MFS(2, trajectoryDataService.getAllUniqueDoublets(), T);
         //TODO: MFS Tree construction
         return _T;
     }

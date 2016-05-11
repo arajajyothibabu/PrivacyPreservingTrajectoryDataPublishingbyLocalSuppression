@@ -89,4 +89,49 @@ public class Utils {
         return sequence.split("-").length;
     }
 
+    public static boolean areSubsets(String path, String q) throws Exception {
+        ArrayList<String> masterDoublets = Utils.arrayToArrayList(path.split("-"));
+        ArrayList<String> childDoublets = Utils.arrayToArrayList(q.split("-"));
+        for(String doublet : childDoublets){
+            if(!masterDoublets.contains(doublet))
+                return false;
+        }
+        return true;
+    }
+
+    public static boolean areSubsets(String path, ArrayList<String> q) throws Exception {
+        ArrayList<String> masterDoublets = Utils.arrayToArrayList(path.split("-"));
+        for(String doublet : q){
+            if(!masterDoublets.contains(doublet))
+                return false;
+        }
+        return true;
+    }
+
+    public static boolean areSubsets(ArrayList<String> path, ArrayList<String> q) throws Exception {
+        for(String doublet : q){
+            if(!path.contains(doublet))
+                return false;
+        }
+        return true;
+    }
+
+    public static int frequencyOf_Sequence(String sequence, ArrayList<RawDataModel> T_q) throws Exception {
+        int count = 0;
+        for(RawDataModel tuple : T_q){
+            if(areSubsets(tuple.getPath(), sequence))
+                count++;
+        }
+        return count;
+    }
+
+    public static int frequencyOf_Sequence(ArrayList<String> sequence, ArrayList<RawDataModel> T_q) throws Exception {
+        int count = 0;
+        for(RawDataModel tuple : T_q){
+            if(areSubsets(tuple.getPath(), sequence))
+                count++;
+        }
+        return count;
+    }
+
 }
