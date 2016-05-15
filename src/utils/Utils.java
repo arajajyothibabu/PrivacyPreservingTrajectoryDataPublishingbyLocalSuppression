@@ -5,10 +5,7 @@ import models.SensitiveDataModel;
 import models.TrajectoryDataModel;
 
 import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.StringJoiner;
+import java.util.*;
 
 /**
  * Created by Araja Jyothi Babu on 15-Apr-16.
@@ -132,6 +129,27 @@ public class Utils {
                 count++;
         }
         return count;
+    }
+
+    public static String digitsFromString(String str){
+        return str.replaceAll("\\D+","");
+    }
+
+    public static int numberFromString(String str){
+        return Integer.valueOf(digitsFromString(str));
+    }
+
+    public static boolean isSubsetOfAny(ArrayList<String> sequence, SortedMap<String, HashMap<ArrayList<String>, Integer>> mvs) throws Exception{
+        Collection<HashMap<ArrayList<String>, Integer>> keys = mvs.values();
+        for(HashMap<ArrayList<String>, Integer> map : keys){
+            for(ArrayList<String> seq : map.keySet()){
+                System.out.println("first-------");printList(seq);
+                if(areSubsets(seq, sequence)){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 }
