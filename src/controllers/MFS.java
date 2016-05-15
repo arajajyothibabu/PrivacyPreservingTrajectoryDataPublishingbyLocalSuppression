@@ -10,8 +10,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.*;
 
-import static utils.Utils.frequencyOf_Sequence;
-import static utils.Utils.printList;
+import static utils.Utils.*;
 
 /**
  * Created by Araja Jyothi Babu on 12-May-16.
@@ -72,38 +71,41 @@ public class MFS {
     }
 
     void generateItemSets() {
-        int N = 1;
+        int N = listOfItems.size();
         ArrayList<ArrayList<String>> Combinations = combinations(listOfItems); //storing all combinations
         HashMap<ArrayList<String>,Integer> candidateNItemSet = new HashMap<ArrayList<String>,Integer>();
         SortedMap<String, HashMap<ArrayList<String>, Integer>> mvs = new TreeMap<String, HashMap<ArrayList<String>, Integer>>();
         try {
+            int frequency = 0;
             while(true) {
                 for(ArrayList<String> combination : Combinations) {
-                    if(combination.size() == N) {
-                        candidateNItemSet.put(combination, frequencyOf_Sequence(combination, data));
+                    //printList(combination);
+                    //System.out.print(isSubsetOfAny(combination, mvs));
+                    frequency = frequencyOf_Sequence(combination, data);
+                    if(combination.size() == N && frequency > 1 && !isSubsetOfAny(combination, mvs)) {
+                        candidateNItemSet.put(combination, frequency);
                     }
                 }
-                if(candidateNItemSet.size() == 0)
+                if(N == 0)
                     break;
-                /*System.out.println("Candidte-"+N+"-ItemSet");
+                System.out.println("Candidte-"+N+"-ItemSet");
                 for(Map.Entry me : candidateNItemSet.entrySet())
                 {
                     System.out.println(">>"+me.getKey()+"\t"+me.getValue());
-                }*/
+                }
                 System.out.println("Frequent-"+N+"-ItemSet");
-                for(Map.Entry me : candidateNItemSet.entrySet())
-                {
+                for(Map.Entry me : candidateNItemSet.entrySet()) {
                     if((Integer)me.getValue() >= minSupportCount)
                         System.out.println(">>"+me.getKey()+"\t"+me.getValue());
                 }
-                mvs.put(String.valueOf(N), candidateNItemSet);
+                if(candidateNItemSet.size() > 0 )
+                    mvs.put(String.valueOf(N), candidateNItemSet);
                 candidateNItemSet.clear();
                 System.out.println("*************************************************");
-                N++; //incrementing N-candidateSet
+                N--; //incrementing N-candidateSet
             }
         }
-        catch(Exception e)
-        {
+        catch(Exception e) {
             System.out.println("Error: "+ e);
         }
     }
