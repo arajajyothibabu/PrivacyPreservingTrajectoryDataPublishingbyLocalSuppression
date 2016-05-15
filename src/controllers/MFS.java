@@ -77,22 +77,24 @@ public class MFS {
         SortedMap<String, HashMap<ArrayList<String>, Integer>> mvs = new TreeMap<String, HashMap<ArrayList<String>, Integer>>();
         try {
             int frequency = 0;
+            ArrayList<ArrayList<String>> collectedSequences = new ArrayList();
             while(true) {
                 for(ArrayList<String> combination : Combinations) {
                     //printList(combination);
                     //System.out.print(isSubsetOfAny(combination, mvs));
                     frequency = frequencyOf_Sequence(combination, data);
-                    if(combination.size() == N && frequency > 1 && !isSubsetOfAny(combination, mvs)) {
+                    if(combination.size() == N && frequency > 1 && !isSubsetOfAny(combination, collectedSequences)) {
+                        collectedSequences.add(combination);
                         candidateNItemSet.put(combination, frequency);
                     }
                 }
                 if(N == 0)
                     break;
-                System.out.println("Candidte-"+N+"-ItemSet");
+                /*System.out.println("Candidte-"+N+"-ItemSet");
                 for(Map.Entry me : candidateNItemSet.entrySet())
                 {
                     System.out.println(">>"+me.getKey()+"\t"+me.getValue());
-                }
+                }*/
                 System.out.println("Frequent-"+N+"-ItemSet");
                 for(Map.Entry me : candidateNItemSet.entrySet()) {
                     if((Integer)me.getValue() >= minSupportCount)

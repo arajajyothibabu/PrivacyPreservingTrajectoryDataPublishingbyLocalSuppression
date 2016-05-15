@@ -143,10 +143,18 @@ public class Utils {
         Collection<HashMap<ArrayList<String>, Integer>> keys = mvs.values();
         for(HashMap<ArrayList<String>, Integer> map : keys){
             for(ArrayList<String> seq : map.keySet()){
-                System.out.println("first-------");printList(seq);
                 if(areSubsets(seq, sequence)){
                     return true;
                 }
+            }
+        }
+        return false;
+    }
+
+    public static boolean isSubsetOfAny(ArrayList<String> sequence, ArrayList<ArrayList<String>> sequences) throws Exception{
+        for(ArrayList<String> currentSequence : sequences){
+            if(areSubsets(currentSequence, sequence)){
+                return true;
             }
         }
         return false;
