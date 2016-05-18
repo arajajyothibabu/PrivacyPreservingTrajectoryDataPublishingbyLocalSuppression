@@ -363,19 +363,20 @@ public class TrajectoryDataAnonymizor {
         return privacyGain(p, mvs) / utilityLoss(p) + 1;
     }
 
-    SortedMap<String, Integer> getScoreTable(ArrayList<String> mvs) throws Exception{
-        SortedMap<String, Integer> scoreTable = new TreeMap<String, Integer>();
+    Map<String, Integer> getScoreTable(ArrayList<String> mvs) throws Exception{
+        TreeMap<String, Integer> scoreTable = new TreeMap<String, Integer>();
         ArrayList<String> doublets = trajectoryDataService.getAllUniqueDoublets();
         for(String doublet : doublets){
             scoreTable.put(doublet, scoreOf(doublet, mvs));
         }
-        return scoreTable;
+        return scoreTable.descendingMap();
     }
 
     public ArrayList<RawDataModel> anonymizedData() throws Exception {
         ArrayList<RawDataModel> _T = new ArrayList();
         ArrayList<String> V_T = minimalViolatingSequences();
-        SortedMap<String, Integer> scoreTable = getScoreTable(V_T);
+        Map<String, Integer> scoreTable = getScoreTable(V_T);
+        //TODO:
         return _T;
     }
 
