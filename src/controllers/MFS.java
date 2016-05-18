@@ -70,11 +70,16 @@ public class MFS {
         return output;
     }
 
-    void generateItemSets() {
+    public SortedMap<String, Integer> utilityLossTable() {
         int N = listOfItems.size();
         ArrayList<ArrayList<String>> Combinations = combinations(listOfItems); //storing all combinations
         HashMap<ArrayList<String>,Integer> candidateNItemSet = new HashMap<ArrayList<String>,Integer>();
-        SortedMap<String, HashMap<ArrayList<String>, Integer>> mvs = new TreeMap<String, HashMap<ArrayList<String>, Integer>>();
+        SortedMap<String, Integer> utilityLoss = new TreeMap<String, Integer>(new Comparator<String>() { //Utility table
+            @Override
+            public int compare(String o1, String o2) {
+                return numberFromString(digitsFromString(o1)) - numberFromString(digitsFromString(o2));
+            }
+        });
         try {
             int frequency = 0;
             ArrayList<ArrayList<String>> collectedSequences = new ArrayList();
@@ -90,26 +95,33 @@ public class MFS {
                 }
                 if(N == 0)
                     break;
-                /*System.out.println("Candidte-"+N+"-ItemSet");
-                for(Map.Entry me : candidateNItemSet.entrySet())
-                {
-                    System.out.println(">>"+me.getKey()+"\t"+me.getValue());
-                }*/
-                System.out.println("Frequent-"+N+"-ItemSet");
+                //System.out.println("Frequent-"+N+"-ItemSet");
                 for(Map.Entry me : candidateNItemSet.entrySet()) {
-                    if((Integer)me.getValue() >= minSupportCount)
-                        System.out.println(">>"+me.getKey()+"\t"+me.getValue());
+                    if((Integer)me.getValue() >= minSupportCount) {
+                        //System.out.println(">>" + me.getKey() + "\t" + me.getValue());
+                        ArrayList<String> list = (ArrayList<String>)me.getKey();
+                        //TODO: we can construct MFS tree here if need
+                        for(String p : list){
+                            if(!utilityLoss.containsKey(p)){
+                                utilityLoss.put(p, 1);
+                            }else{
+                                utilityLoss.put(p, utilityLoss.get(p)+1);
+                            }
+                        }
+                    }
                 }
-                if(candidateNItemSet.size() > 0 )
-                    mvs.put(String.valueOf(N), candidateNItemSet);
                 candidateNItemSet.clear();
-                System.out.println("*************************************************");
+                //System.out.println("*************************************************");
                 N--; //incrementing N-candidateSet
             }
+            /*for(Map.Entry me : utilityLoss.entrySet()) {
+                System.out.println(">>"+me.getKey()+"\t"+me.getValue());
+            }*/
         }
         catch(Exception e) {
             System.out.println("Error: "+ e);
         }
+        return utilityLoss;
     }
 
 }
