@@ -25,7 +25,6 @@ public class MFS {
         this.minSupportCount = minSupportCount;
         listOfItems = items;
         this.data = data;
-        generateItemSets();
     }
 
     private static int pow(int a,int b) {

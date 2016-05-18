@@ -345,12 +345,37 @@ public class TrajectoryDataAnonymizor {
         return false;
     }
 
+    int privacyGain(String p, ArrayList<String> mvs) throws Exception{
+        int noOfMVSEliminated = 0;
+        for(String m : mvs){
+            if(m.contains(p))
+                noOfMVSEliminated++;
+        }
+        return noOfMVSEliminated;
+    }
+
+    int utilityLoss(String p) throws Exception{
+        SortedMap<String, Integer> utilityLoss = new MFS(2, trajectoryDataService.getAllUniqueDoublets(), T).utilityLossTable();
+        return utilityLoss.get(p);
+    }
+
+    int scoreOf(String p, ArrayList<String> mvs) throws Exception{
+        return privacyGain(p, mvs) / utilityLoss(p) + 1;
+    }
+
+    SortedMap<String, Integer> getScoreTable(ArrayList<String> mvs) throws Exception{
+        SortedMap<String, Integer> scoreTable = new TreeMap<String, Integer>();
+        ArrayList<String> doublets = trajectoryDataService.getAllUniqueDoublets();
+        for(String doublet : doublets){
+            scoreTable.put(doublet, scoreOf(doublet, mvs));
+        }
+        return scoreTable;
+    }
+
     public ArrayList<RawDataModel> anonymizedData() throws Exception {
         ArrayList<RawDataModel> _T = new ArrayList();
-        //ArrayList<String> mVS = minimalViolatingSequences();
-        printList(trajectoryDataService.getAllUniqueDoublets());
-        MFS mfs = new MFS(2, trajectoryDataService.getAllUniqueDoublets(), T);
-        //TODO: MFS Tree construction
+        ArrayList<String> V_T = minimalViolatingSequences();
+        SortedMap<String, Integer> scoreTable = getScoreTable(V_T);
         return _T;
     }
 
