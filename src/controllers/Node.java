@@ -8,12 +8,12 @@ import java.util.List;
  */
 class Node
 {
-    int supportCount = 0;
+    int noOfMFS = 0;
     char name;
-    Node(char name)
-    {
-        this.supportCount++;
+    List<Node> children =  new ArrayList<Node>();
+
+    Node(char name){
+        this.noOfMFS++;
         this.name = name;
     }
-    List<Node> children =  new ArrayList<Node>();
 }
